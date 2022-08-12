@@ -7,4 +7,3 @@ class lowmaf_data(BaseModel):
     intake_air_temp: int
     mass_airflow_voltage: float
     cl_ol_status: int
-
