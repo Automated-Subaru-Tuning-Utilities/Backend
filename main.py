@@ -14,4 +14,5 @@ app = FastAPI()
 @app.post("/api/analyze/0/")
 async def read_data( log: List[lowmaf_data] ):
     resp = lowmaf_calc.main(log)
+    resp = dict(resp)
     return resp

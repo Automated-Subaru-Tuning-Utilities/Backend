@@ -20,6 +20,7 @@ def dmafdt(df):
         df.loc[i, "dmafdt"] = abs( ((1000)*(maf2-maf1))/(time2-time1) )
     # filter out too large values
     df = df[df["dmafdt"] < .31]
+    df.reset_index(drop=True, inplace=True) 
     return df
 
 # Step 2
@@ -28,13 +29,69 @@ def dmafdt(df):
 def outlier_filter(df, iat_threshold):
     df = df[df["cl_ol_status"] == 8]
     df = df[df["intake_air_temp"] < iat_threshold]
+    df.reset_index(drop=True, inplace=True) 
     return df
-    
+
+# Step 3
+# Calculate Overall correction = af_correction_short + af_correction_learning
+def overall_correction(df):
+    df.loc[0, "correction"] = 0.0
+    for i in range(1 , len(df)):
+        df.loc[i, "correction"] = df.loc[i, "af_correction_short"] + df.loc[i, "af_correction_learning"]
+    return df
+
+#Step 4, matches corrections observed with cooresponding mafv entry
+# calculates a mean of corrections observed for each entry
+def match_maf(df):
+    maf_voltages = [
+                    [0.00],
+                    [0.94],
+                    [0.98],
+                    [1.02],
+                    [1.05],
+                    [1.09],
+                    [1.13],
+                    [1.17],
+                    [1.21],
+                    [1.25],
+                    [1.29],
+                    [1.33],
+                    [1.37],
+                    [1.41],
+                    [1.48],
+                    [1.56],
+                    [1.64],
+                    [1.72],
+                    [1.80],
+                    [1.87],
+                    [1.95],
+                    [2.03],
+                    [2.11],
+                    [2.19],
+                    [2.27],
+                    [2.34],
+                    [2.42],
+                    [2.54],
+                    [2.66],
+                    [2.77],
+                    [2.89],
+                    [3.01],
+                    [3.12]
+                ]
+    for i in range (0, len(maf_voltages)-1):
+        # print(i)
+        vals = df[(df["mass_airflow_voltage"] > maf_voltages[i][0]) & (df["mass_airflow_voltage"] < maf_voltages[i+1][0])]
+        mean = vals["correction"].mean()
+        maf_voltages[i].append(mean)
+    return maf_voltages
+
 def main(log: List[lowmaf_data]):
     df = pd.DataFrame(log)
     df = dmafdt(df)
     df = outlier_filter(df, 55)
-    print(df)
+    df = overall_correction(df)
+    result = match_maf(df)
+    return result
 
 if __name__ == "__main__":
     testing_data = [
