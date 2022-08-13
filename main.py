@@ -23,6 +23,7 @@ app.add_middleware(
 
 #lowmaf route
 @app.post("/api/analyze/0/")
-async def read_data( log: List[lowmaf_data] ):
-    #resp = lowmaf_calc.main(log)
-    return log
+def read_data( log: List[lowmaf_data] ):
+    resp = lowmaf_calc.main(log)
+    #resp = "Hello from FASTAPI. Your data has been received!"
+    return resp
