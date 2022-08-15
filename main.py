@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from typing import List
+import pandas as pd
+import numpy as np
 import sys
 
 #lowmaf
@@ -12,7 +13,8 @@ app = FastAPI()
 
 #lowmaf route
 @app.post("/api/analyze/0/")
-async def read_data( log: List[lowmaf_data] ):
-    resp = lowmaf_calc.main(log)
-    resp = dict(resp)
-    return resp
+async def read_data( log: list[lowmaf_data] ):
+    #currently testing
+    data = [item.dict() for item in log]
+    df = pd.DataFrame.from_records(data) #fails
+    return df    
