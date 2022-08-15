@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class lowmaf_data(BaseModel):
+class lowmaf_input(BaseModel):
     time: int 
     af_correction_short: float
     af_correction_learning: float

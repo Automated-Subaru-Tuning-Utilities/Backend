@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.append("./models")
-from lowmaf_model import lowmaf_data
+from lowmaf_request_model import lowmaf_input
 from maf_voltages import maf_voltages
 
 # step 1
@@ -53,7 +53,7 @@ def match_maf(df):
         maf_voltages[i].append(mean)
     return maf_voltages
 
-def main(data):
+def main(data: list[lowmaf_input]):
     df = pd.DataFrame([item.dict() for item in data])
     df = dmafdt(df)
     df = outlier_filter(df, 55)
