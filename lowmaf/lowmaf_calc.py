@@ -4,7 +4,6 @@ import pandas as pd
 
 sys.path.append("./models")
 from lowmaf_model import lowmaf_data
-from typing import List
 
 # step 1
 # construct dmaf/dt column
@@ -85,12 +84,16 @@ def match_maf(df):
         maf_voltages[i].append(mean)
     return maf_voltages
 
-def main(log: List[lowmaf_data]):
-    df = pd.DataFrame(log)
+def main(data):
+    #currently testing
+    return data
+    
+    df = pd.DataFrame([item.dict() for item in log])
     df = dmafdt(df)
     df = outlier_filter(df, 55)
     df = overall_correction(df)
     result = match_maf(df)
+    # print(result)
     return result
 
 if __name__ == "__main__":
