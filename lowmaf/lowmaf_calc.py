@@ -4,6 +4,7 @@ import pandas as pd
 
 sys.path.append("./models")
 from lowmaf_model import lowmaf_data
+from maf_voltages import maf_voltages
 
 # step 1
 # construct dmaf/dt column
@@ -39,46 +40,11 @@ def overall_correction(df):
         df.loc[i, "correction"] = df.loc[i, "af_correction_short"] + df.loc[i, "af_correction_learning"]
     return df
 
-#Step 4, matches corrections observed with cooresponding mafv entry
+# Step 4, matches corrections observed with cooresponding mafv entry
 # calculates a mean of corrections observed for each entry
+# maf_voltages imported from ./models/maf_voltages.py
 def match_maf(df):
-    maf_voltages = [
-                    [0.00],
-                    [0.94],
-                    [0.98],
-                    [1.02],
-                    [1.05],
-                    [1.09],
-                    [1.13],
-                    [1.17],
-                    [1.21],
-                    [1.25],
-                    [1.29],
-                    [1.33],
-                    [1.37],
-                    [1.41],
-                    [1.48],
-                    [1.56],
-                    [1.64],
-                    [1.72],
-                    [1.80],
-                    [1.87],
-                    [1.95],
-                    [2.03],
-                    [2.11],
-                    [2.19],
-                    [2.27],
-                    [2.34],
-                    [2.42],
-                    [2.54],
-                    [2.66],
-                    [2.77],
-                    [2.89],
-                    [3.01],
-                    [3.12]
-                ]
     for i in range (0, len(maf_voltages)-1):
-        # print(i)
         vals = df[(df["mass_airflow_voltage"] > maf_voltages[i][0]) & (df["mass_airflow_voltage"] < maf_voltages[i+1][0])]
         mean = vals["correction"].mean()
         mean = np.around(mean, decimals=5)
@@ -88,9 +54,6 @@ def match_maf(df):
     return maf_voltages
 
 def main(data):
-    #currently testing
-    #return data
-    
     df = pd.DataFrame([item.dict() for item in data])
     df = dmafdt(df)
     df = outlier_filter(df, 55)
@@ -101,63 +64,4 @@ def main(data):
     return result
 
 if __name__ == "__main__":
-    testing_data = [
-                {
-                    "time": 0,
-                    "af_correction_short": -4.5,
-                    "af_correction_learning": 0.5,
-                    "intake_air_temp": 44,
-                    "mass_airflow_voltage": 2.1,
-                    "cl_ol_status": 8
-                },
-                {
-                    "time": 500,
-                    "af_correction_short": 15.5,
-                    "af_correction_learning": 0.5,
-                    "intake_air_temp": 48,
-                    "mass_airflow_voltage": 2.2,
-                    "cl_ol_status": 8
-                },
-                {
-                    "time": 1000,
-                    "af_correction_short": 12.1,
-                    "af_correction_learning": 1,
-                    "intake_air_temp": 49,
-                    "mass_airflow_voltage": 2.8,
-                    "cl_ol_status": 8
-                },
-                {
-                    "time": 1500,
-                    "af_correction_short": 12.1,
-                    "af_correction_learning": 1,
-                    "intake_air_temp": 47,
-                    "mass_airflow_voltage": 2.95,
-                    "cl_ol_status": 8
-                },
-                {
-                    "time": 2000,
-                    "af_correction_short": 12.1,
-                    "af_correction_learning": 1,
-                    "intake_air_temp": 50,
-                    "mass_airflow_voltage": 2.75,
-                    "cl_ol_status": 8
-                },
-                {
-                    "time": 2500,
-                    "af_correction_short": 12.1,
-                    "af_correction_learning": 1,
-                    "intake_air_temp": 60,
-                    "mass_airflow_voltage": 2.76,
-                    "cl_ol_status": 10
-                },
-                {
-                    "time": 3000,
-                    "af_correction_short": 12.1,
-                    "af_correction_learning": 1,
-                    "intake_air_temp": 52,
-                    "mass_airflow_voltage": 2.78,
-                    "cl_ol_status": 8
-                }
-
-            ]
-    main(testing_data)
+    print("use this section for testing")
