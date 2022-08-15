@@ -81,19 +81,23 @@ def match_maf(df):
         # print(i)
         vals = df[(df["mass_airflow_voltage"] > maf_voltages[i][0]) & (df["mass_airflow_voltage"] < maf_voltages[i+1][0])]
         mean = vals["correction"].mean()
+        mean = np.around(mean, decimals=5)
+        if (np.isnan(mean)):
+            mean = 0
         maf_voltages[i].append(mean)
     return maf_voltages
 
 def main(data):
     #currently testing
-    return data
+    #return data
     
-    df = pd.DataFrame([item.dict() for item in log])
+    df = pd.DataFrame([item.dict() for item in data])
     df = dmafdt(df)
     df = outlier_filter(df, 55)
     df = overall_correction(df)
     result = match_maf(df)
-    # print(result)
+    print("Results: ")
+    print(result)
     return result
 
 if __name__ == "__main__":
