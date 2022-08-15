@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
+import pandas as pd
+import numpy as np
 import sys
 
 #lowmaf
@@ -24,6 +26,14 @@ app.add_middleware(
 #lowmaf route
 @app.post("/api/analyze/0/")
 def read_data( log: List[lowmaf_data] ):
-    resp = lowmaf_calc.main(log)
-    #resp = "Hello from FASTAPI. Your data has been received!"
+    #resp = lowmaf_calc.main(log)
+    #resp = dict(resp)
+    resp = "Hello from FASTAPI. Your data has been received!"
     return resp
+
+# what @Dominic-W was using
+#async def read_data( log: list[lowmaf_data] ):
+#    #currently testing
+#    data = [item.dict() for item in log]
+#    df = pd.DataFrame.from_records(data) #fails
+#    return df    
