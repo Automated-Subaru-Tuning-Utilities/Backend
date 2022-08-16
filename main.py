@@ -4,7 +4,7 @@ import sys
 
 sys.path.append("lowmaf/models/")
 sys.path.append("lowmaf/")
-from lowmaf_request_model import lowmaf_input
+from lowmaf_request_model import lowmaf_input, lowmaf_output
 import lowmaf_calc
 
 app = FastAPI()
@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 #lowmaf route
-@app.post("/api/analyze/0/")
+@app.post("/api/analyze/0/", response_model = list[lowmaf_output])
 def read_data( log: list[lowmaf_input] ):
     print("Received data that fits into model.")
     resp = lowmaf_calc.main(log)

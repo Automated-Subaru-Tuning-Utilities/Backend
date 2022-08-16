@@ -9,7 +9,6 @@ from pydantic import BaseModel
 #   We can reuse this api for multiple purposes by filtering for only the fields that we need
 #   This also can potentially provide a security benefit by filtering before transport of data, to prevent sensitive info disclosure
 
-
 class lowmaf_input(BaseModel):
     time: int 
     af_correction_short: float
@@ -19,6 +18,6 @@ class lowmaf_input(BaseModel):
     cl_ol_status: int
 
 class lowmaf_output(BaseModel):
-    MafVoltage: float,
-    Correction: float,
+    MafVoltage: float
+    Correction: float
     Frequency: int
