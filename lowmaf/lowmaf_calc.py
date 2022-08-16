@@ -50,23 +50,29 @@ def match_maf(df):
     # for index 0, we check values >=0 and <.94
     # this is due to the way that ECUflash handles interpolation
     vals = df[(df["mass_airflow_voltage"] >= 0) & (df["mass_airflow_voltage"] < maf_voltages[0]["MafVoltage"])]
-    if (len(vals) > 0):
+    freq = len(vals)
+    if (freq > 0):
         mean = vals["correction"].mean()
         mean = np.around(mean, decimals=5)
         maf_voltages[0]["Correction"] = mean
+        maf_voltages[0]["Frequency"] += freq
     for i in range (1, maf_voltages_length):
         vals = df[(df["mass_airflow_voltage"] >= maf_voltages[i]["MafVoltage"]) & (df["mass_airflow_voltage"] < maf_voltages[i+1]["MafVoltage"])]
-        if (len(vals) > 0):
+        freq = len(vals)
+        if (freq > 0):
             mean = vals["correction"].mean()
             mean = np.around(mean, decimals=5)
             maf_voltages[i]["Correction"] = mean
+            maf_voltages[i]["Frequency"] += freq
     # special case for last index
     # we check values >4.69 and <= 5.0
     vals = df[(df["mass_airflow_voltage"] > maf_voltages[len(maf_voltages)-1]["MafVoltage"]) & (df["mass_airflow_voltage"] <= 5.0)]
+    freq = len(vals)
     if (len(vals) > 0):
         mean = vals["correction"].mean()
         mean = np.around(mean, decimals=5)
         maf_voltages[maf_voltages_length]["Correction"] = mean
+        maf_voltages[maf_voltages_length]["Frequency"] += freq
 
     return maf_voltages
 
