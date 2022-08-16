@@ -1,13 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
-import pandas as pd
-import numpy as np
 import sys
 
 sys.path.append("lowmaf/models/")
 sys.path.append("lowmaf/")
-from lowmaf_model import lowmaf_data 
+from lowmaf_request_model import lowmaf_input, lowmaf_output
 import lowmaf_calc
 
 app = FastAPI()
@@ -23,8 +20,8 @@ app.add_middleware(
 )
 
 #lowmaf route
-@app.post("/api/analyze/0/")
-def read_data( log: List[lowmaf_data] ):
+@app.post("/api/analyze/0/", response_model = list[lowmaf_output])
+def read_data( log: list[lowmaf_input] ):
     print("Received data that fits into model.")
     resp = lowmaf_calc.main(log)
     print("Calculations completed. Responding with scaling data.")

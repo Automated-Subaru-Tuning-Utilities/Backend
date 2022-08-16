@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.append("./models")
-from lowmaf_model import lowmaf_data
+from lowmaf_request_model import lowmaf_input
 from maf_voltages import maf_voltages
 
 # step 1
@@ -44,16 +44,39 @@ def overall_correction(df):
 # calculates a mean of corrections observed for each entry
 # maf_voltages imported from ./models/maf_voltages.py
 def match_maf(df):
-    for i in range (0, len(maf_voltages)-1):
-        vals = df[(df["mass_airflow_voltage"] > maf_voltages[i][0]) & (df["mass_airflow_voltage"] < maf_voltages[i+1][0])]
+    # we go from index = 0 to index = len -1 in the loop because we need a special case for the first and last indicies
+    # check length once for optimization (although compiler might do this)
+    maf_voltages_length = len(maf_voltages) - 1
+    # for index 0, we check values >=0 and <.94
+    # this is due to the way that ECUflash handles interpolation
+    vals = df[(df["mass_airflow_voltage"] >= 0) & (df["mass_airflow_voltage"] < maf_voltages[0]["MafVoltage"])]
+    freq = len(vals)
+    if (freq > 0):
         mean = vals["correction"].mean()
         mean = np.around(mean, decimals=5)
-        if (np.isnan(mean)):
-            mean = 0
-        maf_voltages[i].append(mean)
+        maf_voltages[0]["Correction"] = mean
+        maf_voltages[0]["Frequency"] += freq
+    for i in range (1, maf_voltages_length):
+        vals = df[(df["mass_airflow_voltage"] >= maf_voltages[i]["MafVoltage"]) & (df["mass_airflow_voltage"] < maf_voltages[i+1]["MafVoltage"])]
+        freq = len(vals)
+        if (freq > 0):
+            mean = vals["correction"].mean()
+            mean = np.around(mean, decimals=5)
+            maf_voltages[i]["Correction"] = mean
+            maf_voltages[i]["Frequency"] += freq
+    # special case for last index
+    # we check values >4.69 and <= 5.0
+    vals = df[(df["mass_airflow_voltage"] > maf_voltages[len(maf_voltages)-1]["MafVoltage"]) & (df["mass_airflow_voltage"] <= 5.0)]
+    freq = len(vals)
+    if (len(vals) > 0):
+        mean = vals["correction"].mean()
+        mean = np.around(mean, decimals=5)
+        maf_voltages[maf_voltages_length]["Correction"] = mean
+        maf_voltages[maf_voltages_length]["Frequency"] += freq
+
     return maf_voltages
 
-def main(data):
+def main(data: list[lowmaf_input]):
     df = pd.DataFrame([item.dict() for item in data])
     df = dmafdt(df)
     df = outlier_filter(df, 55)
