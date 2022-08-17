@@ -4,7 +4,7 @@ import sys
 
 sys.path.append("lowmaf/models/")
 sys.path.append("lowmaf/")
-from lowmaf_request_model import lowmaf_input, lowmaf_output
+from lowmaf_api_model import lowmaf_input, lowmaf_output
 import lowmaf_calc
 
 app = FastAPI()
