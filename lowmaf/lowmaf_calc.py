@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.append("./models")
-from lowmaf_request_model import lowmaf_input
+from lowmaf_api_model import lowmaf_input
 from maf_voltages import maf_voltages
 
 # step 1
