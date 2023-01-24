@@ -66,8 +66,7 @@ maf_voltages = [
         "Correction": 0.00,
         "Frequency": 0
     },
-    {
-        "MafVoltage": 1.48,
+    {   "MafVoltage": 1.48,
         "Correction": 0.00,
         "Frequency": 0
     },
