@@ -43,6 +43,7 @@ def overall_correction(df):
 # Step 4, matches corrections observed with cooresponding mafv entry
 # calculates a mean of corrections observed for each entry
 # maf_voltages imported from ./models/maf_voltages.py
+# n^2 ?
 def match_maf(df):
     # we go from index = 0 to index = len -1 in the loop because we need a special case for the first and last indicies
     # check length once for optimization (although compiler might do this)
@@ -76,12 +77,45 @@ def match_maf(df):
 
     return maf_voltages
 
+# we can use binary search for n*logn complexity
+def match_maf_binarysearch(df):
+    # at this point we only care about correction and mass_airflow_voltage values
+    df_corrections = df["correction"].tolist()
+    df_voltages = df["mass_airflow_voltage"].tolist()
+    maf_voltages_length = len(maf_voltages) - 1
+    for i in range(len(df_corrections)):
+        # binary search to find corresponding maf voltage
+        result_index = -1
+        left = 0
+        right = maf_voltages_length
+        while(right - left) > 1:
+            middle = (left+right)//2 
+            if maf_voltages[middle]["MafVoltage"] == df_voltages[i]:
+                result_index = middle
+                break
+            elif maf_voltages[middle]["MafVoltage"] > df_voltages[i]:
+                right = middle
+            else: 
+                left = middle
+        if result_index == -1:
+            dist_to_left = abs(maf_voltages[left]["MafVoltage"] - df_voltages[i])
+            dist_to_right = abs(maf_voltages[right]["MafVoltage"] - df_voltages[i])
+            if dist_to_left < dist_to_right:
+                result_index = left
+            else:
+                result_index = right
+        # now that we have the result index, we can match it
+        maf_voltages[result_index]["Correction"] = (maf_voltages[result_index]["Correction"] * maf_voltages[result_index]["Frequency"] + df_corrections[i])/ (maf_voltages[result_index]["Frequency"] + 1) 
+        maf_voltages[result_index]["Frequency"] += 1
+    return maf_voltages
+
 def main(data: list[lowmaf_input]):
     df = pd.DataFrame([item.dict() for item in data])
     df = dmafdt(df)
     df = outlier_filter(df, 55)
     df = overall_correction(df)
-    result = match_maf(df)
+    # result = match_maf(df)
+    result = match_maf_binarysearch(df)
     print("Results: ")
     print(result)
     return result
